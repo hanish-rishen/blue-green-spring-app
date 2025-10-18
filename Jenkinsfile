@@ -29,9 +29,12 @@ pipeline {
     }
     stage('Deploy to Green Environment') {
       steps {
-        sh 'kubectl apply -f deployment-green.yaml || true'  // Ensures it exists
-        sh 'kubectl set image deployment/myapp-green myapp=${IMAGE} --record'
-        sh 'kubectl rollout status deployment/myapp-green'
+        sh '''
+          export KUBECONFIG=~/.kube/config
+          kubectl apply -f deployment-green.yaml || true
+          kubectl set image deployment/myapp-green myapp=${IMAGE} --record
+          kubectl rollout status deployment/myapp-green
+        '''
       }
     }
     stage('Validate New Version (Manual Approval)') {
@@ -41,7 +44,10 @@ pipeline {
     }
     stage('Switch Service Traffic') {
       steps {
-        sh 'kubectl patch service myapp-service -p \'{"spec":{"selector":{"app":"myapp","color":"${COLOR}"}}}\'\''
+        sh '''
+          export KUBECONFIG=~/.kube/config
+          kubectl patch service myapp-service -p \'{"spec":{"selector":{"app":"myapp","color":"${COLOR}"}}}\''
+        '''
       }
     }
   }
