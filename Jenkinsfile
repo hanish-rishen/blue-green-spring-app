@@ -44,10 +44,10 @@ pipeline {
     }
     stage('Switch Service Traffic') {
       steps {
-        sh '''
+        sh """
           export KUBECONFIG=/var/lib/jenkins/.kube/config
-          kubectl patch service myapp-service -p \'{"spec":{"selector":{"app":"myapp","color":"${COLOR}"}}}\' --insecure-skip-tls-verify
-        '''
+          kubectl patch service myapp-service -p '{\"spec\":{\"selector\":{\"app\":\"myapp\",\"color\":\"$COLOR\"}}}' --insecure-skip-tls-verify
+        """
       }
     }
   }
