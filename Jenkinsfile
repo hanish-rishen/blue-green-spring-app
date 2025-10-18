@@ -30,10 +30,10 @@ pipeline {
     stage('Deploy to Green Environment') {
       steps {
         sh '''
-          export KUBECONFIG=~/.kube/config
-          kubectl apply -f deployment-green.yaml || true
-          kubectl set image deployment/myapp-green myapp=${IMAGE} --record
-          kubectl rollout status deployment/myapp-green
+          export KUBECONFIG=/var/lib/jenkins/.kube/config
+          kubectl apply -f deployment-green.yaml --insecure-skip-tls-verify || true
+          kubectl set image deployment/myapp-green myapp=${IMAGE} --record --insecure-skip-tls-verify
+          kubectl rollout status deployment/myapp-green --insecure-skip-tls-verify
         '''
       }
     }
@@ -45,8 +45,8 @@ pipeline {
     stage('Switch Service Traffic') {
       steps {
         sh '''
-          export KUBECONFIG=~/.kube/config
-          kubectl patch service myapp-service -p \'{"spec":{"selector":{"app":"myapp","color":"${COLOR}"}}}\''
+          export KUBECONFIG=/var/lib/jenkins/.kube/config
+          kubectl patch service myapp-service -p \'{"spec":{"selector":{"app":"myapp","color":"${COLOR}"}}}\' --insecure-skip-tls-verify
         '''
       }
     }
